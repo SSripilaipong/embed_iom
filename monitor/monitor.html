@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <title>IoM Monitor</title>
+    <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+        }
+
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+
+        tr:nth-child(even) {
+          background-color: #dddddd;
+        }
+    </style>
+</head>
+<body>
+
+
+<p>
+    type: <select id="sensor_type">
+        <option value="light">light</option>
+        <option value="humid">humid</option>
+    </select>
+    id: <input id="sensor_id" type="number" placeholder=1>
+    <button id="btn" type="button" onclick="reset_table()">monitor</button>
+</p>
+
+<table id="listing-table">
+  <tr>
+    <th>Timestamp</th>
+    <th>Type</th>
+    <th>ID</th>
+    <th>Value</th>
+  </tr>
+</table>
+<script>
+    var last_timestamp = null;
+    var interval = null;
+
+    var sensor_type = 'light';
+    var sensor_id = 1;
+
+    $(function(){
+        query_all();
+
+        interval = setInterval(function(){
+            if(last_timestamp){
+                $.ajax({
+                    url: "http://192.168.43.97:8080/request/status",
+                    type: "POST",
+                    crossDomain: true,
+                    data: {'sensor_type': sensor_type, 'sensor_id': sensor_id, 'last_timestamp': last_timestamp},
+                    dataType: "json",
+                    success: callback
+                });
+            }else{
+                query_all();
+            }
+        }, 3000);
+    });
+
+    function reset_table(){
+        $("#listing-table").empty();
+        $('#listing-table')
+            .append('<tr><th>Timestamp</th><th>Type</th><th>ID</th><th>Value</th></tr>');
+        sensor_type = $('#sensor_type').val();
+        sensor_id = $('#sensor_id').val();
+        query_all();
+    }
+
+    function add_row(row){
+        $('#listing-table tr:last')
+            .after('<tr><td>'+row.timestamp+'</td><td>'+row.sensor_type+'</td><td>'+row.sensor_id+'</td><td>'+row.value+'</td></tr>');
+    }
+
+    function callback(data){
+        console.log(data);
+        for(var i = 0; i < data.length; i++) {
+            var row = data[i];
+            add_row(row);
+        }
+        if(i > 0)last_timestamp = data[i-1].timestamp;
+    }
+
+    function query_all(){
+        $.ajax({
+            url: "http://192.168.43.97:8080/request/status",
+            type: "POST",
+            crossDomain: true,
+            data: {'sensor_type': sensor_type, 'sensor_id': sensor_id},
+            dataType: "json",
+            success: callback
+        });
+    }
+
+</script>
+</body>
+</html>

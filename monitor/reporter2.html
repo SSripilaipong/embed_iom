@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <title>IoM Reporter</title>
+</head>
+<body>
+
+<p>
+    URL: <input id="url" type="text">
+</p>
+<!--<p>-->
+    <!--timestamp: <input id="timestamp" type=datetime-local value="2013-10-24T20:36:00" step="1">-->
+    <!--<input id="auto-timestamp" type="checkbox">auto-->
+<!--</p>-->
+<p>
+    id: <input id="sensor_id" type="number">
+</p>
+<p>
+    light: <input id="light" type="number">
+    humid: <input id="humid" type="number">
+    <button id="btn" type="button" onclick="report()">report</button>
+</p>
+
+<script>
+    var URL = "http://192.168.43.97:8080";
+
+    $(function() {
+        $('#url').val(URL);
+        $('#sensor_id').val(1);
+
+        update_timestamp();
+    });
+
+    function report(){
+        <!--data = {-->
+            <!--'timestamp': $('#timestamp').val(),-->
+            <!--'sensor_id': $('#sensor_id').val(),-->
+            <!--'humid': $('#light').val(),-->
+            <!--'light': $('#humid').val(),-->
+        <!--}-->
+
+        data = {
+            'sensor_id': $('#sensor_id').val(),
+            'humid': $('#light').val(),
+            'light': $('#humid').val(),
+        }
+
+        $('#btn').prop("disabled", true);
+        $.ajax({
+            url: URL+"/request/report2",
+            type: "POST",
+            crossDomain: true,
+            data: data,
+            dataType: "html",
+            success: function(data){
+                $('#btn').prop("disabled", false);
+            },
+        });
+    }
+
+    function update_timestamp(){
+        var date = new Date();
+        $('#timestamp').val(date.toISOString().split('.')[0]);
+    }
+
+    setInterval(function(){
+        if($('#auto-timestamp').prop("checked"))
+            update_timestamp();
+    }, 1000);
+
+</script>
+</body>
+</html>
