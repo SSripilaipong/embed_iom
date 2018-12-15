@@ -52,7 +52,7 @@
   </tr>
 </table>
 <script>
-    var URL = "http://192.168.43.97:8080";
+    var URL = "http://localhost:8080";
     var last_timestamp = null;
     var interval = null;
 
@@ -81,6 +81,7 @@
     });
 
     function reset_table(){
+        URL = $('#url').val();
         $("#listing-table").empty();
         $('#listing-table')
             .append('<tr><th>Timestamp</th><th>ID</th><th>Light</th><th>Humid</th></tr>');

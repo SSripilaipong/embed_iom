@@ -24,7 +24,7 @@
 </p>
 
 <script>
-    var URL = "http://192.168.43.97:8080";
+    var URL = "http://localhost:8080";
 
     $(function() {
         $('#url').val(URL);
@@ -34,6 +34,7 @@
     });
 
     function report(){
+        URL = $('#url').val();
         <!--data = {-->
             <!--'timestamp': $('#timestamp').val(),-->
             <!--'sensor_id': $('#sensor_id').val(),-->
